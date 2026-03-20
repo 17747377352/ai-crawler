@@ -1,0 +1,48 @@
+{
+  "name": "ai-crawler",
+  "version": "1.0.0",
+  "description": "AI-powered web crawler with multi-engine search and browser automation",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "cli": "node dist/cli.js",
+    "api": "node dist/api.js",
+    "start": "npm run build && npm run api",
+    "lint": "eslint src/**/*.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "crawler",
+    "ai",
+    "web-scraping",
+    "browser-automation",
+    "search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.6.0",
+    "commander": "^12.1.0",
+    "cors": "^2.8.6",
+    "express": "^4.21.1",
+    "js-yaml": "^4.1.0",
+    "openai": "^4.73.0",
+    "puppeteer": "^23.9.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.0",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

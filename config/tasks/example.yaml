@@ -1,0 +1,24 @@
+id: example-task
+name: Example News Crawl
+description: Crawl latest tech news from search results
+source: search
+searchQuery: latest AI technology news 2024
+extractFields:
+  - name: title
+    description: Article title
+    required: true
+  - name: summary
+    description: Brief summary of the article
+    required: true
+  - name: key_points
+    description: Key points or highlights from the article
+    required: false
+  - name: sentiment
+    description: Overall sentiment (positive/negative/neutral)
+    required: false
+options:
+  maxPages: 5
+  depth: 1
+  delay: 3000
+  useBrowser: true
+  respectRobots: true

@@ -1,0 +1,77 @@
+# Example news crawler configuration
+name: "Tech News Crawler"
+description: "Crawl tech news websites for latest articles"
+
+# Search configuration (optional - if you want to use webserp first)
+search:
+  enabled: true
+  query: "latest AI news 2026"
+  engines: ["google", "brave", "duckduckgo"]
+  maxResults: 20
+  domains:
+    - "techcrunch.com"
+    - "wired.com"
+    - "theverge.com"
+    - "arstechnica.com"
+
+# Direct URL list (alternative to search)
+urls:
+  - "https://techcrunch.com/"
+  - "https://www.wired.com/"
+  - "https://www.theverge.com/"
+
+# Browser automation settings
+browser:
+  headless: true
+  timeout: 30000
+  waitFor: ".article-list"  # Wait for this selector before extracting
+  scrollToBottom: true      # Scroll to load more content
+  removeSelectors:          # Remove unwanted elements
+    - "nav"
+    - "header"
+    - "footer"
+    - ".advertisement"
+
+# Data extraction schema
+extraction:
+  fields:
+    - name: "title"
+      selector: "h1, h2, .headline"
+      type: "text"
+      required: true
+    - name: "author"
+      selector: ".byline, .author-name"
+      type: "text"
+      required: false
+    - name: "publishDate"
+      selector: ".publish-date, time"
+      type: "datetime"
+      required: false
+    - name: "content"
+      selector: ".article-body, .post-content"
+      type: "html"
+      required: true
+    - name: "tags"
+      selector: ".tag, .category"
+      type: "array"
+      required: false
+
+# Anti-bot measures
+antiBot:
+  delay: 2000           # Delay between requests (ms)
+  randomDelay: true     # Add random delay variation
+  proxy: null           # Proxy server (optional)
+  userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+
+# Storage settings
+storage:
+  deduplicate: true     # Skip already crawled URLs
+  incremental: true     # Only crawl new content
+  cleanupDays: 30       # Auto-delete old records after 30 days
+
+# AI parsing settings
+ai:
+  enabled: true         # Use AI to parse and structure content
+  model: "kimi-latest"  # AI model to use
+  temperature: 0.3      # Lower temperature for more consistent results
+  maxTokens: 2000       # Maximum tokens for AI response
