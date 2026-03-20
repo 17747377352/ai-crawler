@@ -3,6 +3,7 @@
  */
 import { WebSerpSkill } from '../skills/webserp.js';
 import { BrowserSkill } from '../skills/browser.js';
+import { SimpleFetcher } from './simple-fetcher.js';
 import { Storage } from './storage.js';
 import { AIParser } from './parser.js';
 import { EventEmitter } from 'events';
@@ -31,6 +32,7 @@ export interface CrawlTask {
     depth?: number;
     delay?: number;
     useBrowser?: boolean;
+    useSimpleFetcher?: boolean;  // Use axios instead of puppeteer
     respectRobots?: boolean;
     proxy?: string;
   };
@@ -52,6 +54,7 @@ export class Crawler extends EventEmitter {
   private storage: Storage;
   private webserp: WebSerpSkill;
   private browser: BrowserSkill;
+  private simpleFetcher: SimpleFetcher;
   private parser: AIParser;
   private activeTasks: Map<string, boolean> = new Map();
 
@@ -60,6 +63,7 @@ export class Crawler extends EventEmitter {
     this.storage = new Storage(dataDir);
     this.webserp = new WebSerpSkill();
     this.browser = new BrowserSkill();
+    this.simpleFetcher = new SimpleFetcher();
     this.parser = new AIParser();
   }
 
@@ -190,12 +194,19 @@ export class Crawler extends EventEmitter {
    */
   private async crawlUrl(url: string, task: CrawlTask): Promise<CrawlResult> {
     const useBrowser = task.options?.useBrowser !== false;
+    const useSimpleFetcher = task.options?.useSimpleFetcher === true;
     
     let content: string;
     let title: string;
     let links: string[] = [];
 
-    if (useBrowser) {
+    if (useSimpleFetcher) {
+      // Use simple HTTP fetch (no browser needed)
+      const pageContent = await this.simpleFetcher.fetch(url);
+      content = pageContent.text;
+      title = pageContent.title;
+      links = pageContent.links.map(l => l.href);
+    } else if (useBrowser) {
       // Use browser automation
       const pageContent = await this.browser.fetch(url, {
         selector: task.selectors?.content,
@@ -207,8 +218,8 @@ export class Crawler extends EventEmitter {
       title = pageContent.title;
       links = pageContent.links.map(l => l.href);
     } else {
-      // Use simple HTTP fetch (not implemented, fallback to browser)
-      const pageContent = await this.browser.fetch(url);
+      // Fallback to simple fetcher
+      const pageContent = await this.simpleFetcher.fetch(url);
       content = pageContent.text;
       title = pageContent.title;
       links = pageContent.links.map(l => l.href);
@@ -285,6 +296,7 @@ export class Crawler extends EventEmitter {
    */
   async close(): Promise<void> {
     await this.browser.close();
+    await this.simpleFetcher.close();
     this.storage.close();
   }
 
